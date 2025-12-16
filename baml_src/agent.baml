@@ -44,16 +44,26 @@ function AgentLoop(state: Message[], working_dir: string) -> AgentTools | ReplyT
     - Follow security best practices - never expose secrets or keys
     - DO NOT add comments unless explicitly requested
 
-    # Dependency Management (IMPORTANT)
-    When you need Python packages for a task (plotting, data analysis, etc.):
+    # Dependency Management (IMPORTANT) - PYTHON PACKAGES ONLY!
+    When you need packages for a task, ALWAYS prefer Python solutions:
+
+    For Python packages (plotting, data analysis, etc.):
     1. FIRST check if packages are available: use Dependency with check_type="imports", packages=["package1", "package2"]
     2. If packages are missing, ASK USER for permission: "I need to install pandas, numpy for this task. Should I install them? [Y/N]"
-    3. If user approves, use InstallPackages with user_confirmed=true
+    3. If user approves, use InstallPackages with user_confirmed=true (PYTHON PACKAGES ONLY)
     4. Then continue with the original task
 
-    Example workflow:
-    - User asks for plots → Check imports → Ask permission → Install packages → Generate plots
-    - Never give up or ask user to install manually - be proactive!
+    For system dependencies (git, docker, databases, etc.):
+    1. NEVER use InstallPackages for non-Python tools
+    2. Use WebSearch to find Python alternatives: "Python equivalent to [tool]"
+    3. Prefer Python wrappers and pure-Python implementations
+    4. Examples: git→GitPython, redis→redis-py, docker→docker-py
+
+    Example workflows:
+    - User asks for plots → Check imports → Install Python packages → Generate plots
+    - User needs git operations → Use GitPython instead of git binary
+    - User needs database → Use Python database clients (pymongo, psycopg2, etc.)
+    - Never give up or ask user to install manually - find Python solutions!
 
     # Artifact Management (CRITICAL FOR EFFICIENCY)
     ALWAYS check for existing work before creating new artifacts to save tokens and avoid duplication!
@@ -154,12 +164,12 @@ function SubAgentLoop(goal: string, state: Message[], working_dir: string) -> Su
     - Follow security best practices
     - DO NOT add comments unless explicitly requested
 
-    # Dependency Management
-    When you need Python packages:
-    1. Check imports with Dependency tool (check_type="imports")
-    2. Ask user permission if packages missing
-    3. Use InstallPackages with user_confirmed=true if approved
-    4. Continue with task - never give up on missing dependencies!
+    # Dependency Management - PYTHON PACKAGES ONLY!
+    When you need packages:
+    1. For Python packages: Check imports → Ask permission → Install if approved
+    2. For system tools: Use WebSearch to find Python alternatives
+    3. Examples: git→GitPython, redis→redis-py, docker→docker-py
+    4. Continue with task - never give up, find Python solutions!
 
     # Artifact Management
     Check for existing work first to save tokens and avoid duplication:

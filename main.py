@@ -14,6 +14,62 @@ from baml_client import types
 _todo_store: list[types.TodoItem] = []
 
 
+def is_interrupted() -> bool:
+    """Check if agent execution has been interrupted"""
+    try:
+        from agent_runtime import AgentRuntime
+        if hasattr(AgentRuntime, '_current_state') and AgentRuntime._current_state:
+            return AgentRuntime._current_state.interrupt_requested
+    except:
+        pass
+    return False
+
+
+async def run_interruptible_subprocess(cmd, timeout=120, **kwargs):
+    """Run subprocess with interrupt checking for long-running commands"""
+    if is_interrupted():
+        return subprocess.CompletedProcess(cmd, 130, "", "Process interrupted by user")
+
+    try:
+        # For shorter commands, just run normally
+        if timeout <= 10:
+            return subprocess.run(cmd, timeout=timeout, **kwargs)
+
+        # For longer commands, check for interrupts periodically
+        process = subprocess.Popen(cmd, **kwargs)
+
+        # Check every 0.5 seconds for interrupt
+        check_interval = 0.5
+        elapsed = 0
+
+        while process.poll() is None and elapsed < timeout:
+            if is_interrupted():
+                process.terminate()
+                try:
+                    process.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                return subprocess.CompletedProcess(cmd, 130, "", "Process interrupted by user")
+
+            await asyncio.sleep(check_interval)
+            elapsed += check_interval
+
+        if process.poll() is None:
+            # Timeout reached
+            process.terminate()
+            try:
+                process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                process.kill()
+            raise subprocess.TimeoutExpired(cmd, timeout)
+
+        stdout, stderr = process.communicate()
+        return subprocess.CompletedProcess(cmd, process.returncode, stdout, stderr)
+
+    except Exception as e:
+        raise e
+
+
 def execute_bash(tool: types.BashTool, working_dir: str = ".") -> str:
     """Execute a bash command and return the output"""
     try:
@@ -1081,6 +1137,84 @@ def execute_install_packages(tool: types.InstallPackagesTool, working_dir: str =
         if not packages:
             return "❌ Error: No packages specified for installation"
 
+        # Validate Python packages only
+        non_python_indicators = [
+            'brew', 'homebrew', 'apt', 'yum', 'pacman',  # Package managers
+            'node', 'npm', 'yarn',  # Node.js
+            'docker', 'kubernetes', 'helm',  # Container tools
+            'git', 'svn', 'mercurial',  # VCS (use GitPython instead)
+            'redis', 'mongodb', 'postgresql',  # Databases (use Python clients)
+            'nginx', 'apache', 'mysql',  # Servers
+            'terraform', 'ansible',  # Infrastructure
+            'ruby', 'go', 'rust', 'java',  # Other languages
+        ]
+
+        invalid_packages = []
+        python_alternatives = {
+            'git': 'GitPython',
+            'redis': 'redis-py',
+            'mongodb': 'pymongo',
+            'postgresql': 'psycopg2-binary',
+            'mysql': 'PyMySQL',
+            'sqlite': 'sqlite3 (built-in)',
+            'docker': 'docker-py',
+            'kubernetes': 'kubernetes-client',
+            'node': 'pynode or find Python equivalent',
+            'npm': 'find Python equivalent',
+        }
+
+        for package in packages:
+            package_lower = package.lower()
+
+            # Check if package name exactly matches or starts with non-Python indicators
+            # But allow Python wrappers that contain these terms (e.g., GitPython, redis-py)
+            is_invalid = False
+            for indicator in non_python_indicators:
+                # Exact match
+                if package_lower == indicator:
+                    is_invalid = True
+                    break
+                # Package starts with indicator followed by non-letter character
+                elif package_lower.startswith(indicator + "-") or package_lower.startswith(indicator + "_"):
+                    # Exception: allow common Python wrapper patterns
+                    python_wrapper_patterns = [
+                        "redis-py", "redis_py", "docker-py", "docker_py",
+                        "postgresql-py", "mysql-py"
+                    ]
+                    if package_lower not in python_wrapper_patterns:
+                        is_invalid = True
+                        break
+                # Standalone tool names (but allow Python wrappers like GitPython)
+                elif indicator in ["git", "node", "npm", "docker", "redis"] and package_lower == indicator:
+                    is_invalid = True
+                    break
+
+            if is_invalid:
+                invalid_packages.append(package)
+
+        if invalid_packages:
+            output_lines = []
+            output_lines.append("❌ Error: Non-Python packages detected!")
+            output_lines.append("This tool only installs Python packages from PyPI.")
+            output_lines.append("")
+            output_lines.append("Invalid packages:")
+            for pkg in invalid_packages:
+                output_lines.append(f"  - {pkg}")
+                if pkg.lower() in python_alternatives:
+                    output_lines.append(f"    💡 Try instead: {python_alternatives[pkg.lower()]}")
+
+            output_lines.append("")
+            output_lines.append("For system dependencies:")
+            output_lines.append("1. Use WebSearch to find Python equivalents")
+            output_lines.append("2. Look for Python wrappers or clients")
+            output_lines.append("3. Consider pure-Python implementations")
+            output_lines.append("")
+            output_lines.append("Examples:")
+            output_lines.append("  - git → GitPython")
+            output_lines.append("  - redis → redis-py")
+            output_lines.append("  - docker → docker-py")
+            return "\n".join(output_lines)
+
         # Format output
         output_lines = []
         output_lines.append("📦 Installing packages...")
@@ -1398,6 +1532,15 @@ async def execute_agent(tool: types.AgentTool) -> str:
 
 async def execute_tool(tool: types.AgentTools, working_dir: str = ".") -> str:
     """Execute a tool based on its type using match statement"""
+    # Check for global interrupt state if available
+    try:
+        from agent_runtime import AgentRuntime
+        if hasattr(AgentRuntime, '_current_state') and AgentRuntime._current_state:
+            if AgentRuntime._current_state.interrupt_requested:
+                return "❌ Tool execution interrupted by user"
+    except:
+        pass  # No interrupt checking available
+
     match tool.action:
         case "Bash":
             return execute_bash(tool, working_dir)

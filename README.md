@@ -554,6 +554,33 @@ uv run python main.py "Analyze the sales data and create visualizations" --tui
 - **No duplication**: Finds and builds upon previous work
 - **Persistent workflow**: Work is preserved across sessions
 
+### Python-First Development & Enhanced Interruption (NEW!)
+
+**Python-Only Package Management:**
+- InstallPackagesTool restricted to Python packages from PyPI only
+- Automatic rejection of system dependencies (brew, npm, docker, etc.)
+- Helpful suggestions for Python alternatives (git→GitPython, redis→redis-py)
+- Agent uses WebSearch to find Python equivalents when needed
+
+**Enhanced Interruption System:**
+- **Ctrl+X**: Graceful interrupt - stops after current operation
+- **Double Ctrl+X**: Force interrupt - immediate termination
+- **Real-time feedback**: Shows interrupt status and progress
+- **Interruptible tools**: Long-running operations can be stopped mid-execution
+
+```bash
+# Example: Agent now prefers Python solutions
+User: "I need to interact with git repositories"
+Agent: ✅ Uses GitPython instead of trying to install git binary
+Agent: ✅ Installs only Python packages: uv add GitPython
+
+# Enhanced interruption during long operations
+User: Ctrl+X (during long task)
+Agent: 🚨 Interrupt requested! Will stop gracefully after current operation...
+User: Ctrl+X (again for immediate stop)
+Agent: 🛑 Force termination! Stopping all operations immediately...
+```
+
 **Interactive Coding Workflow:**
 ```bash
 # Launch TUI for coding session

@@ -326,16 +326,38 @@ class BAMMYApp(App):
         """Interrupt the current agent execution (Ctrl+X)"""
         if not self.is_processing:
             return
-        
+
+        # Check if already requested interrupt (double Ctrl+X for force quit)
+        if self.agent_state.interrupt_requested:
+            log = self.query_one(AgentLog)
+            log.write(Panel(
+                Text.from_markup(
+                    "🛑 [bold red]Force termination requested![/] Attempting to stop all operations immediately.\n\n"
+                    "[dim]This may leave some operations in an incomplete state.[/]"
+                ),
+                title="[bold red]🚨 Force Stop[/]",
+                border_style="red"
+            ))
+            # Signal immediate termination
+            self.agent_state.interrupt_requested = True
+            return
+
+        # First interrupt request - graceful stop
         self.agent_state.interrupt_requested = True
         log = self.query_one(AgentLog)
         log.write(Panel(
             Text.from_markup(
-                "[bold red]⚠️  Interrupt Requested[/]\n\n"
-                "Stopping agent at next checkpoint..."
+                "🚨 [bold yellow]Interrupt requested![/] The agent will stop gracefully after current operation completes.\n\n"
+                "[dim]Press Ctrl+X again to force immediate termination.[/]\n"
+                "[dim]Current operation will finish cleanly before stopping.[/]"
             ),
-            border_style="red"
+            title="[bold yellow]⚠️  Interrupting Agent[/]",
+            border_style="yellow"
         ))
+
+        # Update status bar to show interrupt state
+        status = self.query_one(StatusBar)
+        status.update_status("Interrupting...")
     
     # Callback methods for AgentRuntime
     async def on_iteration(self, iteration: int, depth: int) -> None:
@@ -432,7 +454,10 @@ class BAMMYApp(App):
             
             if self.agent_state.interrupt_requested:
                 log.write(Panel(
-                    Text("Agent execution was interrupted by user.", style="yellow"),
+                    Text.from_markup(
+                        "🛑 [bold yellow]Agent execution was interrupted by user.[/]\n\n"
+                        f"[dim]Final result:[/] {result[:200]}{'...' if len(result) > 200 else ''}"
+                    ),
                     title="[bold yellow]⚠️  Interrupted[/]",
                     border_style="yellow"
                 ))

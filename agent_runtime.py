@@ -38,10 +38,15 @@ class AgentCallbacks:
 
 class AgentRuntime:
     """Core agent runtime - shared between CLI and TUI"""
-    
+
+    # Global state reference for interrupt checking from tools
+    _current_state: Optional[AgentState] = None
+
     def __init__(self, state: AgentState, callbacks: Optional[AgentCallbacks] = None):
         self.state = state
         self.callbacks = callbacks or AgentCallbacks()
+        # Set global state reference for tool interrupt checking
+        AgentRuntime._current_state = state
     
     # @trace
     async def execute_tool(self, tool: types.AgentTools, depth: int = 0) -> str:

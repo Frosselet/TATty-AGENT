@@ -562,22 +562,36 @@ class GitDiffTool {
 
 class InstallPackagesTool {
   action "InstallPackages" @description(#"
-    Install Python packages using uv or pip with user permission.
+    Install PYTHON PACKAGES ONLY using uv or pip with user permission.
+
+    PYTHON PACKAGES ONLY - This tool is restricted to Python packages available on PyPI.
+    DO NOT use for system dependencies like:
+    - brew packages (homebrew)
+    - node packages (npm)
+    - system binaries (apt, yum, etc.)
+    - compiled tools (git, docker, etc.)
+
+    For non-Python dependencies, prefer Python alternatives or use WebSearch to find them:
+    - Instead of 'git' → use 'GitPython'
+    - Instead of 'node tools' → find Python equivalents
+    - Instead of 'system tools' → search for Python implementations
 
     Usage:
     - Automatically detects whether to use uv or pip
-    - Installs packages with proper dependency resolution
+    - Installs Python packages with proper dependency resolution
+    - Validates packages are Python-compatible before installation
     - Provides clear feedback on installation success/failure
     - Can install multiple packages at once
     - Handles both production and development dependencies
 
     IMPORTANT: This tool should only be used after the agent has:
-    1. Detected missing packages needed for a task
+    1. Detected missing PYTHON packages needed for a task
     2. Asked the user for permission to install packages
     3. Received explicit user approval
+    4. Verified packages are available on PyPI (Python packages only)
 
     Parameters:
-    - packages: List of package names to install (required)
+    - packages: List of PYTHON package names to install (required)
     - dev: Install as development dependencies (optional, defaults to false)
     - upgrade: Upgrade packages if already installed (optional, defaults to false)
     - user_confirmed: Confirmation that user approved installation (required)
@@ -585,9 +599,9 @@ class InstallPackagesTool {
     Examples:
     - Install plotting libs: InstallPackages with packages=["pandas", "matplotlib", "seaborn"], user_confirmed=true
     - Install dev deps: InstallPackages with packages=["pytest", "black"], dev=true, user_confirmed=true
-    - Upgrade packages: InstallPackages with packages=["numpy"], upgrade=true, user_confirmed=true
+    - Install web tools: InstallPackages with packages=["requests", "beautifulsoup4"], user_confirmed=true
   "#)
-  packages string[] @description("Package names to install (required)")
+  packages string[] @description("PYTHON package names to install (PyPI packages only)")
   dev bool? @description("Install as development dependencies (default false)")
   upgrade bool? @description("Upgrade packages if already installed (default false)")
   user_confirmed bool @description("User has confirmed installation (required for safety)")
