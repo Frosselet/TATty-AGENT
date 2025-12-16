@@ -1,2 +1,20 @@
 baml/.env
 .env
+
+# Virtual environments
+tatty-agent-env/
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE
+.vscode/
+.idea/
