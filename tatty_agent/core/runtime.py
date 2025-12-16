@@ -3,10 +3,10 @@ Core agent runtime - shared between CLI, TUI, and library modes
 """
 from typing import Optional
 
-from baml_client import types
-from baml_client.async_client import b
+from ..baml_client import types
+from ..baml_client.async_client import b
 from baml_py.errors import BamlValidationError
-from baml_client.tracing import trace
+from ..baml_client.tracing import trace
 
 from .state import AgentState, AgentCallbacks
 

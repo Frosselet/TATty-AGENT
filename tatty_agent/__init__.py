@@ -58,6 +58,7 @@ pip install TATty-agent[full]
 python -c "from tatty_agent.tests import run_installation_tests; run_installation_tests()"
 
 # Access examples and documentation
+python -c "from tatty_agent.examples import show_hello_world; show_hello_world()"
 python -c "from tatty_agent.examples import show_jupyter_demo; show_jupyter_demo()"
 python -c "from tatty_agent.docs import show_readme; show_readme()"
 
@@ -70,7 +71,7 @@ tatty-init
 
 After installation, you have access to:
 
-- **tatty_agent.examples**: Example notebooks and usage patterns
+- **tatty_agent.examples**: Hello World + comprehensive demos
 - **tatty_agent.docs**: Complete documentation and guides
 - **tatty_agent.tests**: Installation validation tests
 - **tatty_agent.jupyter**: Jupyter notebook integration
@@ -203,8 +204,18 @@ class TattyAgent:
         })
 
         try:
-            # Run the agent loop
-            result = asyncio.run(self.runtime.run_loop(query, iterations))
+            # Run the agent loop - handle both regular Python and Jupyter environments
+            try:
+                # Check if we're already in an event loop (like Jupyter)
+                loop = asyncio.get_running_loop()
+                # We're in an event loop (Jupyter), use nest_asyncio
+                import nest_asyncio
+                nest_asyncio.apply(loop)
+                # Now we can safely use asyncio.run
+                result = asyncio.run(self.runtime.run_loop(query, iterations))
+            except RuntimeError:
+                # No running loop, use normal asyncio.run (CLI/script mode)
+                result = asyncio.run(self.runtime.run_loop(query, iterations))
 
             # Add result to conversation history
             self._conversation_history.append({

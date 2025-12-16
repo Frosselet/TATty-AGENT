@@ -7,7 +7,7 @@ interface for the agent runtime to execute tools without tight coupling.
 from typing import Dict, Callable, Awaitable, Union
 import inspect
 
-from baml_client import types
+from ..baml_client import types
 from ..core.types import ToolExecutor
 
 
@@ -152,8 +152,8 @@ def _register_placeholder_tools():
         # Note: Agent tool is handled specially in AgentRuntime.execute_tool
 
     except ImportError as e:
-        # If we can't import main.py, we'll need to handle this gracefully
-        print(f"Warning: Could not register placeholder tools from main.py: {e}")
+        # main.py has been modularized, no longer needed
+        pass  # This is expected in the packaged version
 
 
 # Initialize the registry when this module is imported

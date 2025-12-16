@@ -10,7 +10,7 @@ import glob
 import os
 from pathlib import Path
 
-from baml_client import types
+from ..baml_client import types
 from .registry import register_tool
 
 

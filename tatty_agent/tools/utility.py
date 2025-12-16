@@ -8,7 +8,7 @@ This module contains utility and planning tools extracted from main.py:
 - NotebookRead: Read Jupyter notebook contents
 - NotebookEdit: Edit Jupyter notebook cells
 """
-from baml_client import types
+from ..baml_client import types
 from .registry import register_tool
 
 # In-memory storage for todos (shared global state)

@@ -4,7 +4,7 @@ Agent state management and callback definitions
 from typing import Optional, Callable, Awaitable
 from dataclasses import dataclass, field
 
-from baml_client import types
+from ..baml_client import types
 
 
 @dataclass

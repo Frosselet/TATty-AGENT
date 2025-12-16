@@ -12,7 +12,7 @@ This module contains development-related tools extracted from main.py:
 import subprocess
 from pathlib import Path
 
-from baml_client import types
+from ..baml_client import types
 from .registry import register_tool
 
 

@@ -4,7 +4,7 @@ Common types and interfaces for TATty Agent package
 from typing import Union, Optional, Protocol
 
 # Import BAML client types for re-export
-from baml_client import types
+from ..baml_client import types
 
 
 class ToolExecutor(Protocol):

@@ -13,7 +13,7 @@ import glob as glob_module
 import fnmatch
 from pathlib import Path
 
-from baml_client import types
+from ..baml_client import types
 from .registry import register_tool
 
 

@@ -5,7 +5,7 @@ This module contains web-related tools extracted from main.py:
 - WebFetch: Fetch and process web content from URLs
 - WebSearch: Search the web using DuckDuckGo
 """
-from baml_client import types
+from ..baml_client import types
 from .registry import register_tool
 
 
