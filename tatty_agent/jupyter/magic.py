@@ -69,7 +69,7 @@ class TattyMagics(Magics):
 
     def __init__(self, shell=None):
         super().__init__(shell)
-        self.config = load_config()
+        self.tatty_config = load_config()  # Use different name to avoid conflict with IPython's config
         self.notebook_context = NotebookContextManager(shell) if shell else None
         self._current_runtime: Optional[AgentRuntime] = None
         self._execution_history: List[Dict[str, Any]] = []
@@ -174,7 +174,7 @@ class TattyMagics(Magics):
             return
 
         # Set up working directory
-        working_dir = args.dir or self.config.working_dir
+        working_dir = args.dir or self.tatty_config.working_dir
 
         # Execute the agent
         return self._run_agent_query(
