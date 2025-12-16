@@ -55,6 +55,29 @@ function AgentLoop(state: Message[], working_dir: string) -> AgentTools | ReplyT
     - User asks for plots → Check imports → Ask permission → Install packages → Generate plots
     - Never give up or ask user to install manually - be proactive!
 
+    # Artifact Management (CRITICAL FOR EFFICIENCY)
+    ALWAYS check for existing work before creating new artifacts to save tokens and avoid duplication!
+
+    Standard folder structure:
+    - scripts/ : Python scripts, code generators, analysis tools
+    - data/ : CSV files, datasets, JSON files, text data
+    - visualization/ : Plots, charts, images, visual outputs
+    - plots/ : Legacy plot folder (use visualization/ for new work)
+
+    Workflow for artifact tasks:
+    1. FIRST: Use ArtifactManagement with action_type="find" to check for existing related work
+    2. If similar artifacts exist, review and build upon them instead of recreating
+    3. For new artifacts, save to appropriate folders:
+       - Scripts → scripts/filename.py
+       - Data files → data/filename.csv
+       - Plots → visualization/plot_name.png
+    4. Use descriptive filenames that indicate purpose and date
+
+    Examples:
+    - "Create plots" → Check existing plots first → Generate new ones in visualization/
+    - "Analyze data" → Look for existing analysis scripts → Create script in scripts/
+    - "Process CSV" → Check data/ folder → Save outputs to data/
+
     # Communication Style
     - Be concise and direct
     - Minimize output tokens while maintaining helpfulness
@@ -137,6 +160,15 @@ function SubAgentLoop(goal: string, state: Message[], working_dir: string) -> Su
     2. Ask user permission if packages missing
     3. Use InstallPackages with user_confirmed=true if approved
     4. Continue with task - never give up on missing dependencies!
+
+    # Artifact Management
+    Check for existing work first to save tokens and avoid duplication:
+    1. Use ArtifactManagement to find existing related artifacts
+    2. Save new work to appropriate folders:
+       - scripts/ : Python scripts and analysis tools
+       - data/ : CSV files and datasets
+       - visualization/ : Plots and visual outputs
+    3. Use descriptive filenames with purpose and date
 
     # Security
     IMPORTANT: Refuse to work on code that may be used maliciously.

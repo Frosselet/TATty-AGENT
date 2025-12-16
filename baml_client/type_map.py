@@ -19,6 +19,9 @@ type_map = {
     "types.AgentTool": types.AgentTool,
     "stream_types.AgentTool": stream_types.AgentTool,
 
+    "types.ArtifactManagementTool": types.ArtifactManagementTool,
+    "stream_types.ArtifactManagementTool": stream_types.ArtifactManagementTool,
+
     "types.BashTool": types.BashTool,
     "stream_types.BashTool": stream_types.BashTool,
 

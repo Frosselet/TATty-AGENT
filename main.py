@@ -1185,6 +1185,203 @@ def execute_install_packages(tool: types.InstallPackagesTool, working_dir: str =
         return f"❌ Error installing packages: {str(e)}"
 
 
+def execute_artifact_management(tool: types.ArtifactManagementTool, working_dir: str = ".") -> str:
+    """Manage and organize project artifacts in standard folders"""
+    import glob
+    import os
+    from pathlib import Path
+
+    try:
+        # Define standard artifact folders
+        artifact_folders = {
+            "script": ["scripts"],
+            "data": ["data"],
+            "visualization": ["visualization", "plots"],  # Include legacy plots folder
+            "any": ["scripts", "data", "visualization", "plots"]
+        }
+
+        output_lines = []
+        output_lines.append(f"🗂️ Artifact Management: {tool.action_type}")
+
+        if tool.folder:
+            output_lines.append(f"Target folder: {tool.folder}")
+        if tool.pattern:
+            output_lines.append(f"Search pattern: {tool.pattern}")
+        if tool.artifact_type:
+            output_lines.append(f"Artifact type: {tool.artifact_type}")
+
+        output_lines.append(f"Working directory: {working_dir}")
+        output_lines.append("")
+
+        action_type = tool.action_type.lower()
+
+        if action_type == "list":
+            # List artifacts in specified folders
+            folders_to_check = []
+
+            if tool.folder:
+                folders_to_check = [tool.folder]
+            elif tool.artifact_type and tool.artifact_type in artifact_folders:
+                folders_to_check = artifact_folders[tool.artifact_type]
+            else:
+                folders_to_check = artifact_folders["any"]
+
+            total_files = 0
+            for folder in folders_to_check:
+                folder_path = os.path.join(working_dir, folder)
+                if os.path.exists(folder_path):
+                    pattern = tool.pattern or "*"
+                    search_path = os.path.join(folder_path, pattern)
+                    files = glob.glob(search_path, recursive=True)
+
+                    if files:
+                        output_lines.append(f"📁 {folder}/ ({len(files)} files):")
+                        for file_path in sorted(files):
+                            relative_path = os.path.relpath(file_path, working_dir)
+                            file_size = os.path.getsize(file_path)
+                            size_str = f"({file_size:,} bytes)" if file_size < 10000 else f"({file_size//1024:,} KB)"
+                            output_lines.append(f"  - {relative_path} {size_str}")
+                        total_files += len(files)
+                        output_lines.append("")
+                    else:
+                        output_lines.append(f"📁 {folder}/ (empty)")
+                        output_lines.append("")
+                else:
+                    output_lines.append(f"📁 {folder}/ (folder does not exist)")
+                    output_lines.append("")
+
+            output_lines.append(f"📊 Summary: {total_files} total artifacts found")
+
+        elif action_type == "find":
+            # Find specific artifacts across all folders
+            if not tool.pattern:
+                return "❌ Error: pattern parameter required for 'find' action"
+
+            all_matches = []
+            for folder in artifact_folders["any"]:
+                folder_path = os.path.join(working_dir, folder)
+                if os.path.exists(folder_path):
+                    search_path = os.path.join(folder_path, "**", tool.pattern)
+                    matches = glob.glob(search_path, recursive=True)
+                    all_matches.extend(matches)
+
+            if all_matches:
+                output_lines.append(f"🔍 Found {len(all_matches)} matches for '{tool.pattern}':")
+                output_lines.append("")
+
+                # Group by folder
+                by_folder = {}
+                for match in sorted(all_matches):
+                    relative_path = os.path.relpath(match, working_dir)
+                    folder_name = relative_path.split('/')[0]
+                    if folder_name not in by_folder:
+                        by_folder[folder_name] = []
+                    by_folder[folder_name].append(relative_path)
+
+                for folder_name, files in by_folder.items():
+                    output_lines.append(f"📁 {folder_name}/:")
+                    for file_path in files:
+                        file_size = os.path.getsize(os.path.join(working_dir, file_path))
+                        size_str = f"({file_size:,} bytes)" if file_size < 10000 else f"({file_size//1024:,} KB)"
+                        output_lines.append(f"  - {file_path} {size_str}")
+                    output_lines.append("")
+            else:
+                output_lines.append(f"🔍 No matches found for pattern '{tool.pattern}'")
+                output_lines.append("")
+                output_lines.append("💡 Tip: Try broader patterns like '*plot*', '*.py', '*.csv'")
+
+        elif action_type == "organize":
+            # Ensure all standard folders exist and provide organization tips
+            created_folders = []
+            for folder in artifact_folders["any"]:
+                folder_path = os.path.join(working_dir, folder)
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path, exist_ok=True)
+                    created_folders.append(folder)
+
+            if created_folders:
+                output_lines.append(f"✅ Created missing folders: {', '.join(created_folders)}")
+                output_lines.append("")
+
+            # Check for files in root that should be organized
+            root_files = glob.glob(os.path.join(working_dir, "*"))
+            root_files = [f for f in root_files if os.path.isfile(f)]
+
+            suggestions = []
+            for file_path in root_files:
+                filename = os.path.basename(file_path)
+                if filename.endswith(('.py', '.ipynb')) and not filename.startswith(('main.', 'tui.', 'agent_runtime.')):
+                    suggestions.append(f"  mv {filename} scripts/")
+                elif filename.endswith(('.csv', '.json', '.txt', '.xlsx')):
+                    suggestions.append(f"  mv {filename} data/")
+                elif filename.endswith(('.png', '.jpg', '.svg', '.pdf', '.html')):
+                    suggestions.append(f"  mv {filename} visualization/")
+
+            if suggestions:
+                output_lines.append("💡 Organization suggestions for root directory files:")
+                output_lines.extend(suggestions[:10])  # Show first 10 suggestions
+                if len(suggestions) > 10:
+                    output_lines.append(f"  ... and {len(suggestions) - 10} more files")
+                output_lines.append("")
+
+            output_lines.append("📋 Standard folder structure:")
+            output_lines.append("  scripts/       - Python scripts, code generators, analysis tools")
+            output_lines.append("  data/          - CSV files, datasets, JSON files, text data")
+            output_lines.append("  visualization/ - Plots, charts, images, visual outputs")
+            output_lines.append("  plots/         - Legacy plot folder")
+
+        elif action_type == "clean":
+            # Clean up empty folders and provide cleanup suggestions
+            empty_folders = []
+            for folder in artifact_folders["any"]:
+                folder_path = os.path.join(working_dir, folder)
+                if os.path.exists(folder_path) and not os.listdir(folder_path):
+                    empty_folders.append(folder)
+
+            if empty_folders:
+                output_lines.append(f"🗑️ Empty folders found: {', '.join(empty_folders)}")
+                output_lines.append("These folders are kept for future artifact organization")
+                output_lines.append("")
+
+            # Check for duplicate files
+            output_lines.append("🔍 Checking for potential duplicates...")
+            # This is a basic check - could be enhanced with content comparison
+            all_files = []
+            for folder in artifact_folders["any"]:
+                folder_path = os.path.join(working_dir, folder)
+                if os.path.exists(folder_path):
+                    files = glob.glob(os.path.join(folder_path, "**/*"), recursive=True)
+                    all_files.extend([f for f in files if os.path.isfile(f)])
+
+            filenames = {}
+            for file_path in all_files:
+                filename = os.path.basename(file_path)
+                if filename not in filenames:
+                    filenames[filename] = []
+                filenames[filename].append(file_path)
+
+            duplicates = {name: paths for name, paths in filenames.items() if len(paths) > 1}
+            if duplicates:
+                output_lines.append(f"⚠️ Found {len(duplicates)} potential duplicate filenames:")
+                for filename, paths in list(duplicates.items())[:5]:  # Show first 5
+                    output_lines.append(f"  {filename}:")
+                    for path in paths:
+                        relative_path = os.path.relpath(path, working_dir)
+                        output_lines.append(f"    - {relative_path}")
+                if len(duplicates) > 5:
+                    output_lines.append(f"  ... and {len(duplicates) - 5} more")
+            else:
+                output_lines.append("✅ No duplicate filenames found")
+
+        else:
+            return f"❌ Error: Unknown action_type '{tool.action_type}'. Use 'list', 'find', 'organize', or 'clean'"
+
+        return "\n".join(output_lines)
+
+    except Exception as e:
+        return f"❌ Error managing artifacts: {str(e)}"
+
+
 async def execute_agent(tool: types.AgentTool) -> str:
     """Launch a sub-agent (recursive call)"""
     try:
@@ -1246,6 +1443,8 @@ async def execute_tool(tool: types.AgentTools, working_dir: str = ".") -> str:
             return execute_git_diff(tool, working_dir)
         case "InstallPackages":
             return execute_install_packages(tool, working_dir)
+        case "ArtifactManagement":
+            return execute_artifact_management(tool, working_dir)
         case "Agent":
             return await execute_agent(tool)
         case other:

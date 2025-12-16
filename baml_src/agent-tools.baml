@@ -593,8 +593,46 @@ class InstallPackagesTool {
   user_confirmed bool @description("User has confirmed installation (required for safety)")
 }
 
+class ArtifactManagementTool {
+  action "ArtifactManagement" @description(#"
+    Manage and organize project artifacts in standard folders to avoid duplication.
+
+    Standard Folder Structure:
+    - scripts/ : Python scripts, code generators, analysis tools
+    - data/ : CSV files, datasets, JSON files, text data
+    - visualization/ : Plots, charts, images, visual outputs
+    - plots/ : Legacy plot folder (use visualization/ for new plots)
+
+    Usage:
+    - Check what artifacts already exist before creating new ones
+    - Find related outputs from previous work
+    - Organize new artifacts in appropriate folders
+    - Prevent token waste by reusing existing scripts/data
+    - Maintain clean project structure
+
+    IMPORTANT: Always check existing artifacts before creating new ones!
+    This saves tokens and builds on previous work instead of duplicating effort.
+
+    Parameters:
+    - action_type: What to do ('list', 'find', 'organize', 'clean')
+    - folder: Specific folder to work with (optional)
+    - pattern: File pattern to search for (optional)
+    - artifact_type: Type of artifact ('script', 'data', 'visualization', 'any')
+
+    Examples:
+    - List all scripts: ArtifactManagement with action_type="list", artifact_type="script"
+    - Find plotting scripts: ArtifactManagement with action_type="find", pattern="*plot*"
+    - Check data files: ArtifactManagement with action_type="list", folder="data"
+    - Organize outputs: ArtifactManagement with action_type="organize"
+  "#)
+  action_type string @description("Action to perform: 'list', 'find', 'organize', 'clean'")
+  folder string? @description("Specific folder to work with (scripts/data/visualization/plots)")
+  pattern string? @description("File pattern to search for (e.g., '*plot*', '*.csv')")
+  artifact_type string? @description("Type of artifact: 'script', 'data', 'visualization', 'any'")
+}
+
 // Union type for all tools
 type ScaryTools =  EditTool | MultiEditTool | WriteTool | NotebookEditTool | TodoWriteTool
-type CodingTools = PytestRunTool | LintTool | TypeCheckTool | FormatTool | DependencyTool | GitDiffTool | InstallPackagesTool
+type CodingTools = PytestRunTool | LintTool | TypeCheckTool | FormatTool | DependencyTool | GitDiffTool | InstallPackagesTool | ArtifactManagementTool
 type AgentTools = SubAgentTools | AgentTool
 type SubAgentTools = BashTool | GlobTool | GrepTool | LSTool | ExitPlanModeTool | ReadTool | WebFetchTool | TodoReadTool | TodoWriteTool | WebSearchTool | ScaryTools | CodingTools

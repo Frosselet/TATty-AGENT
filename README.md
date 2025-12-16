@@ -183,7 +183,7 @@ An agent system built with BAML that can execute various tools using pattern mat
 This project demonstrates an agentic system that:
 - Uses BAML to define tool schemas and agent behavior
 - Implements tool handlers using Python's `match` statement
-- Supports 23 different tool types for file operations, coding tools, code execution, web fetching, and more
+- Supports 24 different tool types for file operations, coding tools, code execution, web fetching, and more
 
 ## Architecture
 
@@ -223,6 +223,7 @@ The agent supports the following tools:
 21. **DependencyTool** - Enhanced package analysis with import checking and installation guidance (fully implemented)
 22. **GitDiffTool** - Git diff functionality with context (fully implemented)
 23. **InstallPackagesTool** - Permission-based package installation with uv/pip support (fully implemented)
+24. **ArtifactManagementTool** - Organize and manage project artifacts to avoid duplication (fully implemented)
 
 ## Tool Handler Pattern
 
@@ -248,7 +249,9 @@ async def execute_tool(tool: types.AgentTools) -> str:
             return execute_dependency(tool)
         case "InstallPackages":
             return execute_install_packages(tool)
-        # ... etc for all 23 tools
+        case "ArtifactManagement":
+            return execute_artifact_management(tool)
+        # ... etc for all 24 tools
         case other:
             return f"Unknown tool type: {other}"
 ```
@@ -518,6 +521,38 @@ uv run python main.py "Create a data visualization from my dataset" --tui
 # 4. User approves, agent installs with: uv add pandas matplotlib
 # 5. Agent continues with the original task automatically!
 ```
+
+### Intelligent Artifact Management (NEW!)
+
+The agent automatically organizes and reuses project artifacts to save tokens and avoid duplication:
+
+**Standard Folder Structure:**
+```
+project/
+├── scripts/       # Python scripts, code generators, analysis tools
+├── data/          # CSV files, datasets, JSON files, text data
+├── visualization/ # Plots, charts, images, visual outputs
+└── plots/         # Legacy plot folder
+```
+
+**Smart Workflow:**
+```bash
+# Agent automatically checks for existing work before creating new artifacts
+uv run python main.py "Analyze the sales data and create visualizations" --tui
+
+# Example workflow:
+# 1. Agent checks: "ArtifactManagement find pattern='*sales*'"
+# 2. Finds existing: scripts/sales_analysis.py
+# 3. Reviews existing script instead of recreating from scratch
+# 4. Builds upon existing work or creates enhanced version
+# 5. Saves new outputs to appropriate folders (data/ or visualization/)
+```
+
+**Benefits:**
+- **Token savings**: Reuses existing scripts instead of recreating
+- **Project organization**: All artifacts organized in logical folders
+- **No duplication**: Finds and builds upon previous work
+- **Persistent workflow**: Work is preserved across sessions
 
 **Interactive Coding Workflow:**
 ```bash

@@ -20,7 +20,7 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(type_builder.TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["AgentTool","BashTool","DependencyTool","EditOperation","EditTool","ExitPlanModeTool","FormatTool","GitDiffTool","GlobTool","GrepTool","InstallPackagesTool","LSTool","LintTool","Message","MultiEditTool","NotebookEditTool","NotebookReadTool","PytestRunTool","ReadTool","ReplyToUser","Resume","TodoItem","TodoReadTool","TodoWriteTool","TypeCheckTool","WebFetchTool","WebSearchTool","WriteTool",]
+          ["AgentTool","ArtifactManagementTool","BashTool","DependencyTool","EditOperation","EditTool","ExitPlanModeTool","FormatTool","GitDiffTool","GlobTool","GrepTool","InstallPackagesTool","LSTool","LintTool","Message","MultiEditTool","NotebookEditTool","NotebookReadTool","PytestRunTool","ReadTool","ReplyToUser","Resume","TodoItem","TodoReadTool","TodoWriteTool","TypeCheckTool","WebFetchTool","WebSearchTool","WriteTool",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
@@ -31,12 +31,16 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
     # #########################################################################
-    # Generated classes 28
+    # Generated classes 29
     # #########################################################################
 
     @property
     def AgentTool(self) -> "AgentToolViewer":
         return AgentToolViewer(self)
+
+    @property
+    def ArtifactManagementTool(self) -> "ArtifactManagementToolViewer":
+        return ArtifactManagementToolViewer(self)
 
     @property
     def BashTool(self) -> "BashToolViewer":
@@ -154,7 +158,7 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
 # #########################################################################
-# Generated classes 28
+# Generated classes 29
 # #########################################################################
 
 class AgentToolAst:
@@ -200,6 +204,61 @@ class AgentToolProperties:
     @property
     def prompt(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("prompt"))
+    
+    
+
+
+class ArtifactManagementToolAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("ArtifactManagementTool")
+        self._properties: typing.Set[str] = set([  "action",  "action_type",  "folder",  "pattern",  "artifact_type",  ])
+        self._props = ArtifactManagementToolProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ArtifactManagementToolProperties":
+        return self._props
+
+
+class ArtifactManagementToolViewer(ArtifactManagementToolAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class ArtifactManagementToolProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def action(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("action"))
+    
+    @property
+    def action_type(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("action_type"))
+    
+    @property
+    def folder(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("folder"))
+    
+    @property
+    def pattern(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("pattern"))
+    
+    @property
+    def artifact_type(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("artifact_type"))
     
     
 
