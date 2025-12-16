@@ -10,6 +10,9 @@ from typing import Any, Dict, List, Optional, Union, Callable
 from datetime import datetime
 import sys
 
+from ..core.state import AgentState
+from ..core.types import Message
+
 try:
     from IPython import get_ipython
     from IPython.display import display, HTML, Code, Javascript
@@ -21,6 +24,7 @@ except ImportError:
     JUPYTER_AVAILABLE = False
     pd = None
     np = None
+    InteractiveShell = None
 
     def get_ipython():
         return None
@@ -32,10 +36,14 @@ except ImportError:
 class NotebookContextManager:
     """Manages interaction between TATty Agent and Jupyter notebook context"""
 
-    def __init__(self, shell: Optional[InteractiveShell] = None):
+    def __init__(self, shell: Optional[Any] = None):
         self.shell = shell or get_ipython()
         self._variable_cache: Dict[str, Any] = {}
         self._last_cache_time: Optional[datetime] = None
+
+        # Persistent agent state shared across all notebook interactions
+        self._agent_state: Optional[AgentState] = None
+        self._working_dir: str = "."
 
     def get_notebook_variables(self, refresh: bool = False) -> Dict[str, Dict[str, Any]]:
         """
@@ -368,6 +376,84 @@ class NotebookContextManager:
             # If we can't analyze it, skip it
             return None
 
+    def get_persistent_agent_state(self, working_dir: str = ".") -> AgentState:
+        """
+        Get or create the persistent agent state for this notebook session.
+
+        This ensures continuity across all %tatty magic commands and chat widget
+        interactions within the same notebook session.
+
+        Args:
+            working_dir: Working directory for the agent
+
+        Returns:
+            The persistent AgentState instance
+        """
+        if self._agent_state is None:
+            self._agent_state = AgentState(working_dir=working_dir)
+            self._working_dir = working_dir
+
+            # Add initial context about notebook environment
+            notebook_vars = self.get_notebook_variables()
+            if notebook_vars:
+                vars_info = f"Notebook session started. Available variables: {', '.join(notebook_vars.keys())}"
+                self._agent_state.messages.append(Message(
+                    role="assistant",
+                    message=f"Session Context: {vars_info}"
+                ))
+        elif working_dir != self._working_dir:
+            # Update working directory if changed
+            self._agent_state.working_dir = working_dir
+            self._working_dir = working_dir
+
+        return self._agent_state
+
+    def update_agent_context(self, message: str, role: str = "assistant") -> None:
+        """
+        Add a context message to the persistent agent state.
+
+        Args:
+            message: The context message to add
+            role: Message role ("user" or "assistant")
+        """
+        state = self.get_persistent_agent_state()
+        state.messages.append(Message(role=role, message=message))
+
+    def clear_agent_memory(self) -> None:
+        """
+        Clear the persistent agent memory for this notebook session.
+        This will start a fresh conversation context.
+        """
+        self._agent_state = None
+
+    def get_conversation_summary(self) -> Dict[str, Any]:
+        """
+        Get a summary of the current conversation state.
+
+        Returns:
+            Dictionary with conversation statistics and recent messages
+        """
+        if self._agent_state is None:
+            return {
+                "total_messages": 0,
+                "recent_messages": [],
+                "conversation_active": False
+            }
+
+        messages = self._agent_state.messages
+        recent_count = min(5, len(messages))
+        recent_messages = [
+            {"role": msg.role, "message": str(msg.message)[:100] + ("..." if len(str(msg.message)) > 100 else "")}
+            for msg in messages[-recent_count:]
+        ]
+
+        return {
+            "total_messages": len(messages),
+            "recent_messages": recent_messages,
+            "conversation_active": len(messages) > 0,
+            "working_dir": self._working_dir
+        }
+
 
 # Global notebook context instance
 _notebook_context: Optional[NotebookContextManager] = None
@@ -393,3 +479,15 @@ def create_cell_with_code(code: str, cell_type: str = "code") -> bool:
     """Convenience function to create a new cell"""
     context = get_notebook_context()
     return context.create_new_cell(code, cell_type) if context else False
+
+def get_agent_conversation_summary() -> Dict[str, Any]:
+    """Get summary of current agent conversation in this notebook"""
+    context = get_notebook_context()
+    return context.get_conversation_summary() if context else {"conversation_active": False}
+
+def clear_agent_memory() -> None:
+    """Clear the agent's memory for this notebook session"""
+    context = get_notebook_context()
+    if context:
+        context.clear_agent_memory()
+        print("✅ Agent memory cleared. Next interaction will start fresh.")

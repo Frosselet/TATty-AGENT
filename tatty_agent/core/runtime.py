@@ -186,8 +186,20 @@ class AgentRuntime:
 
         # Check if agent wants to reply
         if isinstance(response, types.ReplyToUser):
-            if self.callbacks.on_agent_reply:
+            # Stream response if streaming callback is available
+            if self.callbacks.on_response_chunk:
+                # Character-by-character streaming for real-time experience
+                import asyncio
+                response_text = response.message
+
+                for i, char in enumerate(response_text):
+                    await self.callbacks.on_response_chunk(char)
+                    # Add small delay for realistic typing speed (20ms per character)
+                    await asyncio.sleep(0.02)
+            elif self.callbacks.on_agent_reply:
+                # Fallback to regular reply callback
                 await self.callbacks.on_agent_reply(response.message)
+
             return (True, response.message)
 
         # Execute single tool

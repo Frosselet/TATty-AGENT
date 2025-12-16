@@ -1,26 +1,20 @@
 """
 Jupyter Integration for TATty Agent
 
-This module provides comprehensive Jupyter notebook support including:
+This module provides comprehensive Jupyter notebook support with a focus on
+reliable magic commands and rich display formatting.
 
 ## Features
 
-### Interactive Chat Widget
-```python
-from tatty_agent.jupyter import create_chat_widget
-
-chat = create_chat_widget()
-chat.display()
-```
-
-### Magic Commands
+### Magic Commands (Primary Interface)
 ```python
 # Load the magic commands
 %load_ext tatty_agent.jupyter.magic
 
-# Use magic commands
+# Single-line queries
 %tatty "List all Python files"
 
+# Multi-line queries
 %%tatty
 Find all TODO comments
 and create a summary
@@ -60,11 +54,10 @@ with track_tool_execution("MyTool", {"param": "value"}):
 
 ## Components
 
+- **magic**: IPython magic commands (%tatty, %%tatty) - Primary interface
 - **display**: Rich HTML/Markdown formatting and visualization
-- **magic**: IPython magic commands (%tatty, %%tatty)
 - **notebook**: Notebook variable access and cell management
 - **progress**: Real-time progress indicators and execution tracking
-- **widgets**: Interactive chat interface and UI components
 """
 
 # Import all public components
@@ -94,12 +87,6 @@ from .progress import (
     create_interactive_execution_widget
 )
 
-from .widgets import (
-    TattyChatWidget,
-    create_chat_widget,
-    create_quick_chat
-)
-
 # Magic commands are imported separately when needed
 from . import magic
 
@@ -127,12 +114,7 @@ __all__ = [
     'display_execution_summary',
     'create_interactive_execution_widget',
 
-    # Interactive widgets
-    'TattyChatWidget',
-    'create_chat_widget',
-    'create_quick_chat',
-
-    # Magic module (for %load_ext)
+    # Magic commands module (for %load_ext)
     'magic'
 ]
 
@@ -151,12 +133,13 @@ try:
 
         # Provide quick start info
         print("🎉 TATty Agent Jupyter Integration Available!")
-        print("Quick start:")
-        print("  from tatty_agent.jupyter import create_quick_chat")
-        print("  chat = create_quick_chat()  # Interactive chat widget")
-        print()
-        print("  %load_ext tatty_agent.jupyter.magic  # Enable magic commands")
+        print("🎯 Magic Commands (Primary Interface):")
+        print("  %load_ext tatty_agent.jupyter.magic")
         print("  %tatty \"your query here\"")
+        print("  %%tatty")
+        print("  multi-line query here")
+        print()
+        print("💡 TIP: Magic commands provide the most reliable TATty Agent experience!")
 
 except ImportError:
     # Not in Jupyter environment

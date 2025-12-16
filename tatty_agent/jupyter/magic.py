@@ -28,7 +28,8 @@ except ImportError:
     JUPYTER_AVAILABLE = False
     # Fallback for non-Jupyter environments
     class Magics:
-        pass
+        def __init__(self, shell=None):
+            self.shell = shell
 
     def magics_class(cls):
         return cls
@@ -48,16 +49,25 @@ except ImportError:
             return func
         return decorator
 
-    def magic_arguments(func):
-        return func
+    def magic_arguments(func=None):
+        if func is None:
+            # Called as @magic_arguments()
+            def decorator(f):
+                return f
+            return decorator
+        else:
+            # Called as @magic_arguments
+            return func
 
     def argument(*args, **kwargs):
         def decorator(func):
             return func
         return decorator
 
+
 from ..core.runtime import AgentRuntime
 from ..core.state import AgentState, AgentCallbacks
+from ..core.types import Message
 from ..config import load_config
 from .display import display_agent_response, display_progress_indicator, display_tool_execution
 from .notebook import NotebookContextManager
@@ -102,6 +112,11 @@ class TattyMagics(Magics):
         action='store_true',
         help='Clear conversation history'
     )
+    @argument(
+        'query',
+        nargs='*',
+        help='The query for TATty Agent to process'
+    )
     @line_cell_magic
     def tatty(self, line: str, cell: str = None):
         """
@@ -122,7 +137,7 @@ class TattyMagics(Magics):
             print("TATty magic commands require IPython/Jupyter")
             return
 
-        # Parse arguments
+        # Parse arguments using IPython's magic_arguments system
         args = parse_argstring(self.tatty, line)
 
         # Handle special commands
@@ -140,30 +155,8 @@ class TattyMagics(Magics):
         if cell is not None:  # Cell magic
             query = cell.strip()
         else:  # Line magic
-            query = line.strip()
-            # Remove parsed arguments from the query
-            import shlex
-            try:
-                # Simple approach: find the last quoted string or unquoted text
-                tokens = shlex.split(line)
-                # Remove known argument tokens
-                filtered_tokens = []
-                skip_next = False
-                for i, token in enumerate(tokens):
-                    if skip_next:
-                        skip_next = False
-                        continue
-                    if token in ['--dir', '-d', '--max-iterations', '-i']:
-                        skip_next = True
-                        continue
-                    if token in ['--verbose', '-v', '--history', '--clear-history']:
-                        continue
-                    filtered_tokens.append(token)
-
-                query = ' '.join(filtered_tokens)
-            except:
-                # Fallback: use original line without argument parsing
-                query = line.strip()
+            # Join the query list back into a string (due to nargs='*')
+            query = ' '.join(args.query) if args.query else ""
 
         if not query:
             print("❌ Please provide a query for TATty Agent")
@@ -198,22 +191,34 @@ class TattyMagics(Magics):
         display_progress_indicator(f"Processing query: {query[:50]}...")
 
         try:
-            # Set up agent state and callbacks
-            state = AgentState(working_dir=working_dir)
+            # Use persistent agent state for conversation continuity
+            if self.notebook_context:
+                state = self.notebook_context.get_persistent_agent_state(working_dir)
+
+                # Update context with fresh variable info (only if variables changed)
+                notebook_vars = self.notebook_context.get_notebook_variables(refresh=True)
+                if notebook_vars:
+                    vars_info = f"Available notebook variables: {', '.join(notebook_vars.keys())}"
+                    # Only add context if this is significantly different from last update
+                    should_update_context = True
+                    if state.messages:
+                        # Check if recent message already has similar variable context
+                        recent_messages = [str(msg.message) for msg in state.messages[-3:]]
+                        if any("Available notebook variables:" in msg for msg in recent_messages):
+                            should_update_context = False
+
+                    if should_update_context:
+                        state.messages.append(Message(
+                            role="assistant",
+                            message=f"Context: {vars_info}"
+                        ))
+            else:
+                # Fallback to fresh state if no notebook context
+                state = AgentState(working_dir=working_dir)
+
             callbacks = self._create_notebook_callbacks(verbose=verbose)
             runtime = AgentRuntime(state, callbacks)
             self._current_runtime = runtime
-
-            # Add notebook context to state if available
-            if self.notebook_context:
-                notebook_vars = self.notebook_context.get_notebook_variables()
-                if notebook_vars:
-                    # Add available variables info to the beginning of conversation
-                    vars_info = f"Available notebook variables: {', '.join(notebook_vars.keys())}"
-                    state.messages.append({
-                        "role": "system",
-                        "message": f"Context: {vars_info}"
-                    })
 
             # Run the agent
             result = asyncio.run(runtime.run_loop(query, max_iterations))

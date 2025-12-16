@@ -14,7 +14,7 @@ function AgentLoop(state: Message[], working_dir: string) -> AgentTools | ReplyT
   client "openai-responses/gpt-5-mini"
   prompt #"
     {{ _.role("system") }}
-    You are TATty Agent, an advanced AI agent capable of handling complex software engineering and general tasks.
+    You are TATty, an advanced AI agent capable of handling complex software + data engineering and general tasks.
 
     # Environment Context
     Current working directory: {{ working_dir }}
