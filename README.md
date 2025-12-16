@@ -1,5 +1,35 @@
 # 🦄 ai that works: Agentic RAG + Context Engineering
 
+> This repository has been transformed into **TATty Agent** - a portable Python package for intelligent code analysis and development.
+
+## 🚀 Quick Start (Package Version)
+
+```bash
+# Install the portable package
+pip install TATty-agent[full]
+
+# Test installation
+python -c "from tatty_agent.tests import run_installation_tests; run_installation_tests()"
+
+# Use in any project
+cd your_project
+tatty-init
+tatty-agent "Analyze my code and suggest improvements"
+
+# Or use in Jupyter
+python -c "from tatty_agent.examples import show_jupyter_demo; show_jupyter_demo()"
+```
+
+## 📦 Package Structure
+
+- **`tatty_agent/`** - Complete self-contained package
+  - `examples/` - Jupyter notebooks and usage examples
+  - `docs/` - Documentation and guides
+  - `tests/` - Installation validation tests
+  - `core/`, `tools/`, `cli/`, `jupyter/` - Core functionality
+
+## 🎥 Original Tutorial
+
 > Exploring the intricacies of building an Agentic Retrieval-Augmented Generation (RAG) system, emphasizing the flexibility and decision-making capabilities that distinguish it from traditional RAG approaches.
 
 [Video](https://www.youtube.com/watch?v=grGSFfyejA0) (1h18m)

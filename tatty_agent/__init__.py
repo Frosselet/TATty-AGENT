@@ -48,19 +48,33 @@ tatty-status
 - **Development Tools**: Testing, linting, type checking, formatting, dependency management
 - **Artifact Management**: Organized scripts/, data/, visualization/, documents/ folders
 
-## Installation
+## Installation & Testing
 
 ```bash
-# Basic installation
-pip install TATty-agent
-
-# Full installation with all features
+# Install the package
 pip install TATty-agent[full]
+
+# Test your installation
+python -c "from tatty_agent.tests import run_installation_tests; run_installation_tests()"
+
+# Access examples and documentation
+python -c "from tatty_agent.examples import show_jupyter_demo; show_jupyter_demo()"
+python -c "from tatty_agent.docs import show_readme; show_readme()"
 
 # Initialize your project
 cd your-project
 tatty-init
 ```
+
+## Package Contents
+
+After installation, you have access to:
+
+- **tatty_agent.examples**: Example notebooks and usage patterns
+- **tatty_agent.docs**: Complete documentation and guides
+- **tatty_agent.tests**: Installation validation tests
+- **tatty_agent.jupyter**: Jupyter notebook integration
+- **tatty_agent.config**: Configuration and project setup
 """
 
 import asyncio
@@ -433,8 +447,18 @@ __all__ = [
     "__version__",
     "__author__",
     "__email__",
-    "__description__"
+    "__description__",
+
+    # Submodules (imported on demand)
+    # "examples",  # Access via: from tatty_agent import examples
+    # "docs",      # Access via: from tatty_agent import docs
+    # "tests",     # Access via: from tatty_agent import tests
 ]
+
+# Note: Submodules are available as:
+# - from tatty_agent.examples import show_jupyter_demo
+# - from tatty_agent.docs import show_readme
+# - from tatty_agent.tests import run_installation_tests
 
 # Import core components for advanced users
 from .config import TattyConfig, load_config
