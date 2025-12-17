@@ -185,7 +185,7 @@ class AgentRuntime:
             return (True, "Agent execution interrupted by user")
 
         # Check if agent wants to reply
-        if isinstance(response, types.ReplyToUser):
+        if isinstance(response, (types.ReplyToUser, types.ReplyWithCode)):
             # Stream response if streaming callback is available
             if self.callbacks.on_response_chunk:
                 # Character-by-character streaming for real-time experience
@@ -200,6 +200,10 @@ class AgentRuntime:
                 # Fallback to regular reply callback
                 await self.callbacks.on_agent_reply(response.message)
 
+            # Store the full structured response for magic command access
+            self.state.last_response = response
+
+            # Return string message for backward compatibility
             return (True, response.message)
 
         # Execute single tool

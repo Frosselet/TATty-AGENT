@@ -20,18 +20,22 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(type_builder.TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["AgentTool","ArtifactManagementTool","BashTool","DependencyTool","EditOperation","EditTool","ExitPlanModeTool","FormatTool","GitDiffTool","GlobTool","GrepTool","InstallPackagesTool","LSTool","LintTool","Message","MultiEditTool","NotebookEditTool","NotebookReadTool","PytestRunTool","ReadTool","ReplyToUser","Resume","TodoItem","TodoReadTool","TodoWriteTool","TypeCheckTool","WebFetchTool","WebSearchTool","WriteTool",]
+          ["AgentTool","ArtifactManagementTool","BashTool","DependencyTool","EditOperation","EditTool","ExitPlanModeTool","FormatTool","GitDiffTool","GlobTool","GrepTool","InstallPackagesTool","IntentClassification","LSTool","LintTool","Message","MultiEditTool","NotebookEditTool","NotebookReadTool","PytestRunTool","ReadTool","ReplyToUser","ReplyWithCode","Resume","TodoItem","TodoReadTool","TodoWriteTool","TypeCheckTool","WebFetchTool","WebSearchTool","WriteTool",]
         ), enums=set(
-          []
+          ["UserIntent",]
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
 
     # #########################################################################
-    # Generated enums 0
+    # Generated enums 1
     # #########################################################################
+
+    @property
+    def UserIntent(self) -> "UserIntentViewer":
+        return UserIntentViewer(self)
 
 
     # #########################################################################
-    # Generated classes 29
+    # Generated classes 31
     # #########################################################################
 
     @property
@@ -83,6 +87,10 @@ class TypeBuilder(type_builder.TypeBuilder):
         return InstallPackagesToolViewer(self)
 
     @property
+    def IntentClassification(self) -> "IntentClassificationViewer":
+        return IntentClassificationViewer(self)
+
+    @property
     def LSTool(self) -> "LSToolViewer":
         return LSToolViewer(self)
 
@@ -119,6 +127,10 @@ class TypeBuilder(type_builder.TypeBuilder):
         return ReplyToUserViewer(self)
 
     @property
+    def ReplyWithCode(self) -> "ReplyWithCodeViewer":
+        return ReplyWithCodeViewer(self)
+
+    @property
     def Resume(self) -> "ResumeViewer":
         return ResumeViewer(self)
 
@@ -153,12 +165,58 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
 # #########################################################################
-# Generated enums 0
+# Generated enums 1
 # #########################################################################
 
+class UserIntentAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.enum("UserIntent")
+        self._values: typing.Set[str] = set([  "TextResponse",  "ExecutableCode",  "ToolExecution",  ])
+        self._vals = UserIntentValues(self._bldr, self._values)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def values(self) -> "UserIntentValues":
+        return self._vals
+
+
+class UserIntentViewer(UserIntentAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_values(self) -> typing.List[typing.Tuple[str, type_builder.EnumValueViewer]]:
+        return [(name, type_builder.EnumValueViewer(self._bldr.value(name))) for name in self._values]
+    
+
+class UserIntentValues:
+    def __init__(self, enum_bldr: baml_py.EnumBuilder, values: typing.Set[str]):
+        self.__bldr = enum_bldr
+        self.__values = values # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def TextResponse(self) -> type_builder.EnumValueViewer:
+        return type_builder.EnumValueViewer(self.__bldr.value("TextResponse"))
+    
+    @property
+    def ExecutableCode(self) -> type_builder.EnumValueViewer:
+        return type_builder.EnumValueViewer(self.__bldr.value("ExecutableCode"))
+    
+    @property
+    def ToolExecution(self) -> type_builder.EnumValueViewer:
+        return type_builder.EnumValueViewer(self.__bldr.value("ToolExecution"))
+    
+    
+
+
 
 # #########################################################################
-# Generated classes 29
+# Generated classes 31
 # #########################################################################
 
 class AgentToolAst:
@@ -797,6 +855,53 @@ class InstallPackagesToolProperties:
     
 
 
+class IntentClassificationAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("IntentClassification")
+        self._properties: typing.Set[str] = set([  "intent",  "reasoning",  "confidence",  ])
+        self._props = IntentClassificationProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "IntentClassificationProperties":
+        return self._props
+
+
+class IntentClassificationViewer(IntentClassificationAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class IntentClassificationProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def intent(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("intent"))
+    
+    @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
+    @property
+    def confidence(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("confidence"))
+    
+    
+
+
 class LSToolAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
@@ -1256,6 +1361,53 @@ class ReplyToUserProperties:
     @property
     def message(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("message"))
+    
+    
+
+
+class ReplyWithCodeAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("ReplyWithCode")
+        self._properties: typing.Set[str] = set([  "action",  "message",  "python_code",  ])
+        self._props = ReplyWithCodeProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ReplyWithCodeProperties":
+        return self._props
+
+
+class ReplyWithCodeViewer(ReplyWithCodeAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class ReplyWithCodeProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def action(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("action"))
+    
+    @property
+    def message(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("message"))
+    
+    @property
+    def python_code(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("python_code"))
     
     
 

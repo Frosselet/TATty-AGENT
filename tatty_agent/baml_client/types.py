@@ -37,11 +37,16 @@ def get_checks(checks: typing.Dict[CheckName, Check]) -> typing.List[Check]:
 def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
     return all(check.status == "succeeded" for check in get_checks(checks))
 # #########################################################################
-# Generated enums (0)
+# Generated enums (1)
 # #########################################################################
 
+class UserIntent(str, Enum):
+    TextResponse = "TextResponse"
+    ExecutableCode = "ExecutableCode"
+    ToolExecution = "ToolExecution"
+
 # #########################################################################
-# Generated classes (29)
+# Generated classes (31)
 # #########################################################################
 
 class AgentTool(BaseModel):
@@ -122,6 +127,11 @@ class InstallPackagesTool(BaseModel):
     upgrade: typing.Optional[bool] = None
     user_confirmed: bool
 
+class IntentClassification(BaseModel):
+    intent: UserIntent
+    reasoning: str
+    confidence: typing.Union[typing_extensions.Literal['high'], typing_extensions.Literal['medium'], typing_extensions.Literal['low']]
+
 class LSTool(BaseModel):
     action: typing_extensions.Literal['LS']
     path: str
@@ -176,6 +186,11 @@ class ReadTool(BaseModel):
 class ReplyToUser(BaseModel):
     action: typing_extensions.Literal['reply_to_user']
     message: str
+
+class ReplyWithCode(BaseModel):
+    action: typing_extensions.Literal['reply_with_code']
+    message: str
+    python_code: str
 
 class Resume(BaseModel):
     name: str

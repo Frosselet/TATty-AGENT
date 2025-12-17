@@ -24,11 +24,23 @@ class LlmResponseParser:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
+    def AgentDispatcher(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="AgentDispatcher", llm_response=llm_response, mode="request")
+        return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"], result)
+
     def AgentLoop(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"]:
+    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]:
         result = self.__options.merge_options(baml_options).parse_response(function_name="AgentLoop", llm_response=llm_response, mode="request")
-        return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"], result)
+        return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"], result)
+
+    def ClassifyUserIntent(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.IntentClassification:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="ClassifyUserIntent", llm_response=llm_response, mode="request")
+        return typing.cast(types.IntentClassification, result)
 
     def ExtractResume(
         self, llm_response: str, baml_options: BamlCallOptions = {},
@@ -36,11 +48,17 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractResume", llm_response=llm_response, mode="request")
         return typing.cast(types.Resume, result)
 
+    def FixCodeError(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.ReplyWithCode:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="FixCodeError", llm_response=llm_response, mode="request")
+        return typing.cast(types.ReplyWithCode, result)
+
     def SubAgentLoop(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"]:
+    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"]:
         result = self.__options.merge_options(baml_options).parse_response(function_name="SubAgentLoop", llm_response=llm_response, mode="request")
-        return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"], result)
+        return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"], result)
 
     
 
@@ -50,11 +68,23 @@ class LlmStreamParser:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
+    def AgentDispatcher(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"]:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="AgentDispatcher", llm_response=llm_response, mode="stream")
+        return typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], result)
+
     def AgentLoop(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser"]:
+    ) -> typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"]:
         result = self.__options.merge_options(baml_options).parse_response(function_name="AgentLoop", llm_response=llm_response, mode="stream")
-        return typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser"], result)
+        return typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], result)
+
+    def ClassifyUserIntent(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.IntentClassification:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="ClassifyUserIntent", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.IntentClassification, result)
 
     def ExtractResume(
         self, llm_response: str, baml_options: BamlCallOptions = {},
@@ -62,10 +92,16 @@ class LlmStreamParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractResume", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.Resume, result)
 
+    def FixCodeError(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.ReplyWithCode:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="FixCodeError", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.ReplyWithCode, result)
+
     def SubAgentLoop(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser"]:
+    ) -> typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"]:
         result = self.__options.merge_options(baml_options).parse_response(function_name="SubAgentLoop", llm_response=llm_response, mode="stream")
-        return typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser"], result)
+        return typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], result)
 
     

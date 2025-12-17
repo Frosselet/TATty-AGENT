@@ -1,7 +1,7 @@
 """
 Agent state management and callback definitions
 """
-from typing import Optional, Callable, Awaitable
+from typing import Optional, Callable, Awaitable, Any
 from dataclasses import dataclass, field
 
 from ..baml_client import types
@@ -16,6 +16,7 @@ class AgentState:
     current_iteration: int = 0
     current_depth: int = 0
     working_dir: str = "."
+    last_response: Optional[Any] = field(default=None)  # Store last structured response (ReplyToUser or ReplyWithCode)
 
 
 @dataclass

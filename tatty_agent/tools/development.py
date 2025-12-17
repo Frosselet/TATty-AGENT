@@ -389,93 +389,76 @@ def execute_format(tool: types.FormatTool, working_dir: str = ".") -> str:
 
 @register_tool("Dependency")
 def execute_dependency(tool: types.DependencyTool, working_dir: str = ".") -> str:
-    """Manage Python dependencies"""
+    """Check and manage Python dependencies"""
     try:
-        action = tool.action
-        manager = tool.manager or "uv"
+        check_type = tool.check_type or "imports"
+        packages = tool.packages or []
 
-        if manager == "uv":
-            if action == "install":
-                cmd = ["uv", "add"] + (tool.packages if tool.packages else [])
-            elif action == "uninstall":
-                cmd = ["uv", "remove"] + (tool.packages if tool.packages else [])
-            elif action == "list":
-                cmd = ["uv", "pip", "list"]
-            elif action == "update":
-                cmd = ["uv", "sync", "--upgrade"]
-            elif action == "lock":
-                cmd = ["uv", "lock"]
-            else:
-                return f"Error: Unknown action '{action}' for uv"
-
-        elif manager == "pip":
-            if action == "install":
-                cmd = ["pip", "install"] + (tool.packages if tool.packages else [])
-            elif action == "uninstall":
-                cmd = ["pip", "uninstall", "-y"] + (tool.packages if tool.packages else [])
-            elif action == "list":
-                cmd = ["pip", "list"]
-            elif action == "update":
-                cmd = ["pip", "install", "--upgrade"] + (tool.packages if tool.packages else [])
-            else:
-                return f"Error: Unknown action '{action}' for pip"
-
-        else:
-            return f"Error: Unknown package manager '{manager}'. Use 'uv' or 'pip'"
-
-        # Add dev dependencies flag if specified
-        if hasattr(tool, 'dev') and tool.dev and manager == "uv":
-            if action in ["install", "uninstall"]:
-                cmd.append("--dev")
-
-        # Execute command
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=300,  # Package operations can be slow
-            cwd=working_dir
-        )
-
-        # Format output
         output_lines = []
-        output_lines.append(f"Package Manager: {manager}")
-        output_lines.append(f"Action: {action}")
-        output_lines.append(f"Command: {' '.join(cmd)}")
+        output_lines.append(f"Dependency Check: {check_type}")
         output_lines.append("")
 
-        if result.returncode == 0:
-            output_lines.append(f"✅ {action.title()} completed successfully")
+        if check_type == "imports":
+            # Check if packages can be imported
+            if not packages:
+                return "Error: No packages specified for import check"
 
-            if result.stdout:
-                stdout_lines = result.stdout.strip().split('\n')
-                if len(stdout_lines) > 50:
-                    output_lines.extend(stdout_lines[:40])
-                    output_lines.append(f"\n... [Truncated: showing first 40 of {len(stdout_lines)} lines]")
-                    output_lines.extend(stdout_lines[-10:])
-                else:
-                    output_lines.extend(stdout_lines)
-        else:
-            output_lines.append(f"❌ {action.title()} failed")
+            import_results = []
+            for package in packages:
+                try:
+                    __import__(package)
+                    import_results.append(f"✅ {package}: Available")
+                except ImportError:
+                    import_results.append(f"❌ {package}: Not available")
 
-            if result.stdout:
-                output_lines.append("Output:")
+            output_lines.append("Import Check Results:")
+            output_lines.extend(import_results)
+
+        elif check_type == "list" or check_type == "missing":
+            # List installed packages
+            result = subprocess.run(
+                ["pip", "list"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=working_dir
+            )
+
+            if result.returncode == 0:
+                output_lines.append("Installed packages:")
                 output_lines.append(result.stdout.strip())
-
-            if result.stderr:
-                output_lines.append("Errors:")
+            else:
+                output_lines.append("Failed to list packages")
                 output_lines.append(result.stderr.strip())
 
-        output_lines.append(f"\nExit code: {result.returncode}")
+        elif check_type == "outdated":
+            # Check for outdated packages
+            result = subprocess.run(
+                ["pip", "list", "--outdated"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=working_dir
+            )
+
+            if result.returncode == 0:
+                output_lines.append("Outdated packages:")
+                output_lines.append(result.stdout.strip())
+            else:
+                output_lines.append("Failed to check outdated packages")
+                output_lines.append(result.stderr.strip())
+
+        elif check_type == "tree":
+            # Show dependency tree (simplified)
+            output_lines.append("Dependency tree check not implemented yet")
+
+        else:
+            return f"Error: Unknown check_type '{check_type}'. Use 'imports', 'list', 'missing', 'outdated', or 'tree'"
 
         return "\n".join(output_lines)
 
-    except FileNotFoundError:
-        return f"Error: {manager} not found. Install uv with: curl -LsSf https://astral.sh/uv/install.sh | sh"
-    except subprocess.TimeoutExpired:
-        return f"Error: {manager} timed out after 300s"
     except Exception as e:
-        return f"Error managing dependencies: {str(e)}"
+        return f"Error checking dependencies: {str(e)}"
 
 
 @register_tool("GitDiff")

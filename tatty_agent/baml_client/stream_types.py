@@ -23,7 +23,7 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (29)
+# Generated classes (31)
 # #########################################################################
 
 class AgentTool(BaseModel):
@@ -104,6 +104,11 @@ class InstallPackagesTool(BaseModel):
     upgrade: typing.Optional[bool] = None
     user_confirmed: typing.Optional[bool] = None
 
+class IntentClassification(BaseModel):
+    intent: typing.Optional[types.UserIntent] = None
+    reasoning: typing.Optional[str] = None
+    confidence: typing.Optional[typing.Union[str, str, str]] = None
+
 class LSTool(BaseModel):
     action: typing.Optional[str] = None
     path: typing.Optional[str] = None
@@ -158,6 +163,11 @@ class ReadTool(BaseModel):
 class ReplyToUser(BaseModel):
     action: typing.Optional[str] = None
     message: typing.Optional[str] = None
+
+class ReplyWithCode(BaseModel):
+    action: typing.Optional[str] = None
+    message: typing.Optional[str] = None
+    python_code: typing.Optional[str] = None
 
 class Resume(BaseModel):
     name: typing.Optional[str] = None

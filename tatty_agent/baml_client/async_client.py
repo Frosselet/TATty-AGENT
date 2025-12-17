@@ -79,9 +79,24 @@ class BamlAsyncClient:
     def parse_stream(self):
       return self.__llm_stream_parser
     
+    async def AgentDispatcher(self, user_query: str,intent: types.IntentClassification,state: typing.List["types.Message"],working_dir: str,
+        baml_options: BamlCallOptions = {},
+    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            # Use streaming internally when on_tick is provided
+            stream = self.stream.AgentDispatcher(user_query=user_query,intent=intent,state=state,working_dir=working_dir,
+                baml_options=baml_options)
+            return await stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = await self.__options.merge_options(baml_options).call_function_async(function_name="AgentDispatcher", args={
+                "user_query": user_query,"intent": intent,"state": state,"working_dir": working_dir,
+            })
+            return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"], result.cast_to(types, types, stream_types, False, __runtime__))
     async def AgentLoop(self, state: typing.List["types.Message"],working_dir: str,
         baml_options: BamlCallOptions = {},
-    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"]:
+    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]:
         # Check if on_tick is provided
         if 'on_tick' in baml_options:
             # Use streaming internally when on_tick is provided
@@ -93,7 +108,22 @@ class BamlAsyncClient:
             result = await self.__options.merge_options(baml_options).call_function_async(function_name="AgentLoop", args={
                 "state": state,"working_dir": working_dir,
             })
-            return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"], result.cast_to(types, types, stream_types, False, __runtime__))
+            return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"], result.cast_to(types, types, stream_types, False, __runtime__))
+    async def ClassifyUserIntent(self, user_query: str,
+        baml_options: BamlCallOptions = {},
+    ) -> types.IntentClassification:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            # Use streaming internally when on_tick is provided
+            stream = self.stream.ClassifyUserIntent(user_query=user_query,
+                baml_options=baml_options)
+            return await stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = await self.__options.merge_options(baml_options).call_function_async(function_name="ClassifyUserIntent", args={
+                "user_query": user_query,
+            })
+            return typing.cast(types.IntentClassification, result.cast_to(types, types, stream_types, False, __runtime__))
     async def ExtractResume(self, resume: str,
         baml_options: BamlCallOptions = {},
     ) -> types.Resume:
@@ -109,9 +139,24 @@ class BamlAsyncClient:
                 "resume": resume,
             })
             return typing.cast(types.Resume, result.cast_to(types, types, stream_types, False, __runtime__))
+    async def FixCodeError(self, original_query: str,failed_code: str,error_message: str,error_type: str,attempt_number: int,
+        baml_options: BamlCallOptions = {},
+    ) -> types.ReplyWithCode:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            # Use streaming internally when on_tick is provided
+            stream = self.stream.FixCodeError(original_query=original_query,failed_code=failed_code,error_message=error_message,error_type=error_type,attempt_number=attempt_number,
+                baml_options=baml_options)
+            return await stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = await self.__options.merge_options(baml_options).call_function_async(function_name="FixCodeError", args={
+                "original_query": original_query,"failed_code": failed_code,"error_message": error_message,"error_type": error_type,"attempt_number": attempt_number,
+            })
+            return typing.cast(types.ReplyWithCode, result.cast_to(types, types, stream_types, False, __runtime__))
     async def SubAgentLoop(self, goal: str,state: typing.List["types.Message"],working_dir: str,
         baml_options: BamlCallOptions = {},
-    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"]:
+    ) -> typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"]:
         # Check if on_tick is provided
         if 'on_tick' in baml_options:
             # Use streaming internally when on_tick is provided
@@ -123,7 +168,7 @@ class BamlAsyncClient:
             result = await self.__options.merge_options(baml_options).call_function_async(function_name="SubAgentLoop", args={
                 "goal": goal,"state": state,"working_dir": working_dir,
             })
-            return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"], result.cast_to(types, types, stream_types, False, __runtime__))
+            return typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"], result.cast_to(types, types, stream_types, False, __runtime__))
     
 
 
@@ -133,16 +178,40 @@ class BamlStreamClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
+    def AgentDispatcher(self, user_query: str,intent: types.IntentClassification,state: typing.List["types.Message"],working_dir: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="AgentDispatcher", args={
+            "user_query": user_query,"intent": intent,"state": state,"working_dir": working_dir,
+        })
+        return baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]](
+          result,
+          lambda x: typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"], x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
     def AgentLoop(self, state: typing.List["types.Message"],working_dir: str,
         baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"]]:
+    ) -> baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]]:
         ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="AgentLoop", args={
             "state": state,"working_dir": working_dir,
         })
-        return baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"]](
+        return baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"]](
           result,
-          lambda x: typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser"], x.cast_to(types, types, stream_types, True, __runtime__)),
-          lambda x: typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser"], x.cast_to(types, types, stream_types, False, __runtime__)),
+          lambda x: typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.AgentTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.AgentTool", "types.ReplyToUser", "types.ReplyWithCode"], x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
+    def ClassifyUserIntent(self, user_query: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlStream[stream_types.IntentClassification, types.IntentClassification]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="ClassifyUserIntent", args={
+            "user_query": user_query,
+        })
+        return baml_py.BamlStream[stream_types.IntentClassification, types.IntentClassification](
+          result,
+          lambda x: typing.cast(stream_types.IntentClassification, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.IntentClassification, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
     def ExtractResume(self, resume: str,
@@ -157,16 +226,28 @@ class BamlStreamClient:
           lambda x: typing.cast(types.Resume, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
+    def FixCodeError(self, original_query: str,failed_code: str,error_message: str,error_type: str,attempt_number: int,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlStream[stream_types.ReplyWithCode, types.ReplyWithCode]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="FixCodeError", args={
+            "original_query": original_query,"failed_code": failed_code,"error_message": error_message,"error_type": error_type,"attempt_number": attempt_number,
+        })
+        return baml_py.BamlStream[stream_types.ReplyWithCode, types.ReplyWithCode](
+          result,
+          lambda x: typing.cast(stream_types.ReplyWithCode, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.ReplyWithCode, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
     def SubAgentLoop(self, goal: str,state: typing.List["types.Message"],working_dir: str,
         baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"]]:
+    ) -> baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"]]:
         ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="SubAgentLoop", args={
             "goal": goal,"state": state,"working_dir": working_dir,
         })
-        return baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"]](
+        return baml_py.BamlStream[typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"]](
           result,
-          lambda x: typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser"], x.cast_to(types, types, stream_types, True, __runtime__)),
-          lambda x: typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser"], x.cast_to(types, types, stream_types, False, __runtime__)),
+          lambda x: typing.cast(typing.Union["stream_types.BashTool", "stream_types.GlobTool", "stream_types.GrepTool", "stream_types.LSTool", "stream_types.ExitPlanModeTool", "stream_types.ReadTool", "stream_types.WebFetchTool", "stream_types.TodoReadTool", "stream_types.TodoWriteTool", "stream_types.WebSearchTool", "stream_types.EditTool", "stream_types.MultiEditTool", "stream_types.WriteTool", "stream_types.NotebookEditTool", "stream_types.PytestRunTool", "stream_types.LintTool", "stream_types.TypeCheckTool", "stream_types.FormatTool", "stream_types.DependencyTool", "stream_types.GitDiffTool", "stream_types.InstallPackagesTool", "stream_types.ArtifactManagementTool", "stream_types.ReplyToUser", "stream_types.ReplyWithCode"], x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(typing.Union["types.BashTool", "types.GlobTool", "types.GrepTool", "types.LSTool", "types.ExitPlanModeTool", "types.ReadTool", "types.WebFetchTool", "types.TodoReadTool", "types.TodoWriteTool", "types.WebSearchTool", "types.EditTool", "types.MultiEditTool", "types.WriteTool", "types.NotebookEditTool", "types.PytestRunTool", "types.LintTool", "types.TypeCheckTool", "types.FormatTool", "types.DependencyTool", "types.GitDiffTool", "types.InstallPackagesTool", "types.ArtifactManagementTool", "types.ReplyToUser", "types.ReplyWithCode"], x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
     
@@ -177,6 +258,13 @@ class BamlHttpRequestClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
+    async def AgentDispatcher(self, user_query: str,intent: types.IntentClassification,state: typing.List["types.Message"],working_dir: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="AgentDispatcher", args={
+            "user_query": user_query,"intent": intent,"state": state,"working_dir": working_dir,
+        }, mode="request")
+        return result
     async def AgentLoop(self, state: typing.List["types.Message"],working_dir: str,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
@@ -184,11 +272,25 @@ class BamlHttpRequestClient:
             "state": state,"working_dir": working_dir,
         }, mode="request")
         return result
+    async def ClassifyUserIntent(self, user_query: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="ClassifyUserIntent", args={
+            "user_query": user_query,
+        }, mode="request")
+        return result
     async def ExtractResume(self, resume: str,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="ExtractResume", args={
             "resume": resume,
+        }, mode="request")
+        return result
+    async def FixCodeError(self, original_query: str,failed_code: str,error_message: str,error_type: str,attempt_number: int,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="FixCodeError", args={
+            "original_query": original_query,"failed_code": failed_code,"error_message": error_message,"error_type": error_type,"attempt_number": attempt_number,
         }, mode="request")
         return result
     async def SubAgentLoop(self, goal: str,state: typing.List["types.Message"],working_dir: str,
@@ -206,6 +308,13 @@ class BamlHttpStreamRequestClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
+    async def AgentDispatcher(self, user_query: str,intent: types.IntentClassification,state: typing.List["types.Message"],working_dir: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="AgentDispatcher", args={
+            "user_query": user_query,"intent": intent,"state": state,"working_dir": working_dir,
+        }, mode="stream")
+        return result
     async def AgentLoop(self, state: typing.List["types.Message"],working_dir: str,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
@@ -213,11 +322,25 @@ class BamlHttpStreamRequestClient:
             "state": state,"working_dir": working_dir,
         }, mode="stream")
         return result
+    async def ClassifyUserIntent(self, user_query: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="ClassifyUserIntent", args={
+            "user_query": user_query,
+        }, mode="stream")
+        return result
     async def ExtractResume(self, resume: str,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="ExtractResume", args={
             "resume": resume,
+        }, mode="stream")
+        return result
+    async def FixCodeError(self, original_query: str,failed_code: str,error_message: str,error_type: str,attempt_number: int,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="FixCodeError", args={
+            "original_query": original_query,"failed_code": failed_code,"error_message": error_message,"error_type": error_type,"attempt_number": attempt_number,
         }, mode="stream")
         return result
     async def SubAgentLoop(self, goal: str,state: typing.List["types.Message"],working_dir: str,

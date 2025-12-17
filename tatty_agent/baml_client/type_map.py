@@ -52,6 +52,9 @@ type_map = {
     "types.InstallPackagesTool": types.InstallPackagesTool,
     "stream_types.InstallPackagesTool": stream_types.InstallPackagesTool,
 
+    "types.IntentClassification": types.IntentClassification,
+    "stream_types.IntentClassification": stream_types.IntentClassification,
+
     "types.LSTool": types.LSTool,
     "stream_types.LSTool": stream_types.LSTool,
 
@@ -79,6 +82,9 @@ type_map = {
     "types.ReplyToUser": types.ReplyToUser,
     "stream_types.ReplyToUser": stream_types.ReplyToUser,
 
+    "types.ReplyWithCode": types.ReplyWithCode,
+    "stream_types.ReplyWithCode": stream_types.ReplyWithCode,
+
     "types.Resume": types.Resume,
     "stream_types.Resume": stream_types.Resume,
 
@@ -103,5 +109,7 @@ type_map = {
     "types.WriteTool": types.WriteTool,
     "stream_types.WriteTool": stream_types.WriteTool,
 
+
+    "types.UserIntent": types.UserIntent,
 
 }

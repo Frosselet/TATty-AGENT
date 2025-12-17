@@ -212,7 +212,8 @@ class TattyDisplayFormatter:
         query: str,
         result: str,
         execution_time: float,
-        tools_used: List[Dict[str, Any]] = None
+        tools_used: List[Dict[str, Any]] = None,
+        observability_data: Dict[str, Any] = None
     ):
         """Display a complete agent response with rich formatting"""
         self._load_custom_css()
@@ -220,11 +221,20 @@ class TattyDisplayFormatter:
         timestamp = datetime.now().strftime("%H:%M:%S")
         tools_used = tools_used or []
 
+        # Enhanced header with observability data
+        if observability_data:
+            total_tokens_in = observability_data.get('total_tokens', {}).get('input', 0)
+            total_tokens_out = observability_data.get('total_tokens', {}).get('output', 0)
+            steps_count = len(observability_data.get('steps', []))
+            header_stats = f"{timestamp} • {execution_time:.1f}s • 1 task: {steps_count} steps • {total_tokens_in + total_tokens_out:.0f} tokens"
+        else:
+            header_stats = f"{timestamp} • {execution_time:.1f}s"
+
         html_content = f"""
         <div class="tatty-agent-output">
             <div class="tatty-agent-header">
                 <span>🤖 TATty Agent Response</span>
-                <span class="tatty-timestamp">{timestamp} • {execution_time:.1f}s</span>
+                <span class="tatty-timestamp">{header_stats}</span>
             </div>
             <div class="tatty-agent-body">
                 <div class="tatty-conversation-entry tatty-user-message">
@@ -252,8 +262,12 @@ class TattyDisplayFormatter:
 
         display(HTML(html_content))
 
-        # Also provide raw text for copy-paste
-        self._display_raw_text_toggle(result)
+        # Display observability data for copy-paste if available
+        if observability_data:
+            self._display_observability_toggle(observability_data)
+        else:
+            # Fallback to raw text for backward compatibility
+            self._display_raw_text_toggle(result)
 
     def display_tool_execution(
         self,
@@ -458,6 +472,95 @@ class TattyDisplayFormatter:
         else:
             return self._escape_html(content).replace('\n', '<br>')
 
+    def _display_observability_toggle(self, observability_data: Dict[str, Any]):
+        """Display observability JSON with improved styling and copy functionality"""
+        import json
+
+        obs_json = json.dumps(observability_data, indent=2, default=str)
+        obs_id = f"obs_data_{abs(hash(obs_json))}"
+        copy_id = f"copy_btn_{abs(hash(obs_json))}"
+
+        # Extract key metrics for display
+        total_duration = observability_data.get('total_duration', 0)
+        total_tokens_in = observability_data.get('total_tokens', {}).get('input', 0)
+        total_tokens_out = observability_data.get('total_tokens', {}).get('output', 0)
+        steps_count = len(observability_data.get('steps', []))
+
+        html_content = f"""
+        <div style="margin-top: 10px;">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button onclick="
+                    var dataDiv = document.getElementById('{obs_id}');
+                    var isHidden = dataDiv.style.display === 'none';
+                    dataDiv.style.display = isHidden ? 'block' : 'none';
+                    this.innerHTML = isHidden ? '📊 Hide Observability' : '📊 Show Observability JSON ({steps_count} steps, {total_tokens_in + total_tokens_out:.0f} tokens, {total_duration:.1f}s)';
+                " style="
+                    background: #e3f2fd;
+                    border: 1px solid #2196f3;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    color: #1976d2;
+                    font-weight: bold;
+                    flex: 1;
+                ">📊 Show Observability JSON (1 task: {steps_count} steps, {total_tokens_in + total_tokens_out:.0f} tokens, {total_duration:.1f}s)</button>
+
+                <button id="{copy_id}" onclick="copyObservabilityData_{abs(hash(obs_json))}()" style="
+                    background: #f5f5f5;
+                    border: 1px solid #ddd;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    color: #333;
+                    white-space: nowrap;
+                ">📋 Copy JSON</button>
+            </div>
+
+            <div id="{obs_id}" style="
+                display: none;
+                background: #1a1a1a;
+                border: 1px solid #333;
+                border-radius: 6px;
+                padding: 16px;
+                margin-top: 8px;
+                font-family: 'SF Mono', 'Monaco', 'Menlo', 'Roboto Mono', 'Ubuntu Mono', monospace;
+                font-size: 12px;
+                color: #f8f8f2;
+                white-space: pre-wrap;
+                max-height: 500px;
+                overflow-y: auto;
+                line-height: 1.5;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            ">{self._syntax_highlight_json(obs_json)}</div>
+        </div>
+
+        <script>
+            function copyObservabilityData_{abs(hash(obs_json))}() {{
+                var jsonData = {repr(obs_json)};
+                navigator.clipboard.writeText(jsonData).then(() => {{
+                    var btn = document.getElementById('{copy_id}');
+                    var originalText = btn.innerHTML;
+                    btn.innerHTML = '✅ Copied!';
+                    btn.style.background = '#4caf50';
+                    btn.style.borderColor = '#4caf50';
+                    btn.style.color = 'white';
+                    setTimeout(() => {{
+                        btn.innerHTML = originalText;
+                        btn.style.background = '#f5f5f5';
+                        btn.style.borderColor = '#ddd';
+                        btn.style.color = '#333';
+                    }}, 2000);
+                }}).catch(() => {{
+                    alert('Copy failed. Please select the text manually.');
+                }});
+            }}
+        </script>
+        """
+
+        display(HTML(html_content))
+
     def _display_raw_text_toggle(self, text: str):
         """Display a collapsible raw text section for copy-paste"""
         text_id = f"raw_text_{abs(hash(text))}"
@@ -495,6 +598,29 @@ class TattyDisplayFormatter:
 
         display(HTML(html_content))
 
+    def _syntax_highlight_json(self, json_text: str) -> str:
+        """Apply basic syntax highlighting to JSON text"""
+        import re
+
+        # Escape HTML first
+        highlighted = self._escape_html(json_text)
+
+        # Apply syntax highlighting with colors
+        # Strings (keys and values)
+        highlighted = re.sub(r'"([^"]*)":', r'<span style="color: #66d9ef;">&quot;\1&quot;</span>:', highlighted)
+        highlighted = re.sub(r': "([^"]*)"', r': <span style="color: #a6e22e;">&quot;\1&quot;</span>', highlighted)
+
+        # Numbers
+        highlighted = re.sub(r'\b(\d+\.?\d*)\b', r'<span style="color: #fd971f;">\1</span>', highlighted)
+
+        # Booleans and null
+        highlighted = re.sub(r'\b(true|false|null)\b', r'<span style="color: #66d9ef;">\1</span>', highlighted)
+
+        # Brackets and braces
+        highlighted = re.sub(r'([{}[\]])', r'<span style="color: #f92672;">\1</span>', highlighted)
+
+        return highlighted
+
     def _escape_html(self, text: str) -> str:
         """Escape HTML special characters"""
         return (text.replace("&", "&amp;")
@@ -530,9 +656,9 @@ class TattyDisplayFormatter:
 _default_formatter = TattyDisplayFormatter()
 
 # Convenience functions
-def display_agent_response(query: str, result: str, execution_time: float, tools_used: List[Dict[str, Any]] = None):
+def display_agent_response(query: str, result: str, execution_time: float, tools_used: List[Dict[str, Any]] = None, observability_data: Dict[str, Any] = None):
     """Display a rich agent response"""
-    _default_formatter.display_agent_response(query, result, execution_time, tools_used)
+    _default_formatter.display_agent_response(query, result, execution_time, tools_used, observability_data)
 
 def display_tool_execution(tool_name: str, params: Dict[str, Any], result: str, execution_time: float = None):
     """Display a tool execution result"""
